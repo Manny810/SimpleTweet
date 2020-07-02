@@ -36,12 +36,13 @@ public class TimelineActivity extends AppCompatActivity {
     TweetsAdapter adapter;
     SwipeRefreshLayout swipeContainer;
     EndlessRecyclerViewScrollListener scrollListener;
+    MenuItem miActionProgressItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
-        
+
         client = TwitterApp.getRestClient(this);
 
         swipeContainer = findViewById(R.id.swipeContainer);
@@ -54,7 +55,9 @@ public class TimelineActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 Log.i(TAG, "fetching new data");
+                showProgressBar();
                 populateHomeTimeline();
+                hideProgressBar();
             }
         });
 
@@ -84,7 +87,27 @@ public class TimelineActivity extends AppCompatActivity {
         populateHomeTimeline(); 
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // Store instance of the menu item containing progress
+        miActionProgressItem = menu.findItem(R.id.miActionProgress);
+        Log.d(TAG, "onPrepareOptionsMenu called");
+        // Return to finish
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    public void showProgressBar() {
+        // Show progress item
+        miActionProgressItem.setVisible(true);
+    }
+
+    public void hideProgressBar() {
+        // Hide progress item
+        miActionProgressItem.setVisible(false);
+    }
+
     private void loadMoreData() {
+        showProgressBar();
         // Send an API request to retrieve appropriate paginated data
         //  --> Send the request including an offset value (i.e `page`) as a query parameter.
         client.getNextPageOfTweets(new JsonHttpResponseHandler() {
@@ -98,6 +121,7 @@ public class TimelineActivity extends AppCompatActivity {
                     //  --> Append the new data objects to the existing set of items inside the array of items
                     //  --> Notify the adapter of the new items made with `notifyItemRangeInserted()`
                     adapter.addAll(tweets);
+                    hideProgressBar();
 
                 } catch (JSONException e) {
                     Log.e(TAG, "jsonError while loading more data", e);
@@ -111,7 +135,6 @@ public class TimelineActivity extends AppCompatActivity {
 
             }
         }, tweets.get(tweets.size() - 1).id);
-
     }
 
     @Override
@@ -137,6 +160,7 @@ public class TimelineActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK){
+            showProgressBar();
             // Get data from the intent (tweet)
             Tweet tweet = Parcels.unwrap(data.getParcelableExtra("tweet"));
 
@@ -146,12 +170,13 @@ public class TimelineActivity extends AppCompatActivity {
             // Update the adapter
             adapter.notifyItemInserted(0);
             rvTweets.smoothScrollToPosition(0);
-
+            hideProgressBar();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void populateHomeTimeline() {
+        //showProgressBar();
         client.getHomeTimeline(new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
@@ -176,5 +201,6 @@ public class TimelineActivity extends AppCompatActivity {
 
             }
         });
+        //hideProgressBar();
     }
 }
