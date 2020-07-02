@@ -47,4 +47,14 @@
         android:layout_marginTop="0dp"
         android:layout_toEndOf="@+id/tvScreenName"
         tools:text="x hrs ago" />
+
+    <ImageView
+        android:id="@+id/ivMedia"
+        android:layout_width="wrap_content"
+        android:layout_height="120dp"
+        android:layout_below="@+id/tvBody"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_toEndOf="@+id/ivProfileImage"
+        tools:srcCompat="@tools:sample/backgrounds/scenic" />
 </RelativeLayout>
