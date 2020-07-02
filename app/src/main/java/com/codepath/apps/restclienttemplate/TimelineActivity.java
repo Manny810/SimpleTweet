@@ -2,6 +2,7 @@ package com.codepath.apps.restclienttemplate;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -11,6 +12,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.codepath.apps.restclienttemplate.models.Tweet;
@@ -27,6 +31,8 @@ import okhttp3.Headers;
 
 public class TimelineActivity extends AppCompatActivity {
     public static final String TAG = "TimelineActivity";
+
+    public static final int MAX_TWEET_LENGTH = 140;
 
     private final int REQUEST_CODE = 20;
 
@@ -84,7 +90,16 @@ public class TimelineActivity extends AppCompatActivity {
         //Adds the scroll listener to RecyclerView
         rvTweets.addOnScrollListener(scrollListener);
 
-        populateHomeTimeline(); 
+        populateHomeTimeline();
+        //showEditDialog();
+    }
+
+    private void showEditDialog() {
+        FragmentManager fm = getSupportFragmentManager();
+        ComposeDialogFragment editNameDialogFragment = ComposeDialogFragment.newInstance("ComposeActivity");
+        editNameDialogFragment.show(fm, "fragment_compose");
+
+
     }
 
     @Override
@@ -148,7 +163,7 @@ public class TimelineActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.compose){
             // compose icon was selected
-
+            //showEditDialog();
             //Navigate to the compose activity
             Intent intent = new Intent(this, ComposeActivity.class);
             startActivityForResult(intent, REQUEST_CODE);
